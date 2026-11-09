@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test de Fatiga</title>
+<meta name="description" content="Test de Fatiga: evaluación breve de la fatiga con la Escala de Severidad de Fatiga (FSS). Resultado inmediato y envío a la psicóloga por WhatsApp.">
+<meta name="theme-color" content="#123c3a">
+<meta property="og:title" content="Test de Fatiga">
+<meta property="og:description" content="Evalúa tu nivel de fatiga en 3 minutos y envía el resultado a tu psicóloga.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://images.pexels.com/photos/5699466/pexels-photo-5699466.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&fit=crop">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://test-de-fatiga.netlify.app/">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Test de Fatiga">
+<meta name="twitter:description" content="Evalúa tu nivel de fatiga en 3 minutos y envía el resultado a tu psicóloga.">
+<meta name="twitter:image" content="https://images.pexels.com/photos/5699466/pexels-photo-5699466.jpeg?auto=compress&cs=tinysrgb&w=1200&h=630&fit=crop">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10201f; --deep:#123c3a; --teal:#1f6f68; --mint:#7fd1c1; --sand:#f6efe6;
+  --peach:#f2a07b; --rose:#d9666f; --gold:#e8b44c; --card:#ffffff; --muted:#5b6b69;
+  --radius:22px; --shadow:0 18px 50px -20px rgba(18,60,58,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--sand);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;letter-spacing:-.01em}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font:inherit}
+
+/* fondo animado */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(160deg,#f6efe6 0%,#eef6f3 55%,#f9e6dc 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 18s ease-in-out infinite}
+.b1{width:420px;height:420px;background:var(--mint);top:-120px;left:-100px}
+.b2{width:360px;height:360px;background:var(--peach);bottom:-120px;right:-80px;animation-delay:-6s}
+.b3{width:260px;height:260px;background:var(--gold);top:40%;left:55%;opacity:.3;animation-delay:-11s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,30px) scale(1.08)}66%{transform:translate(-30px,20px) scale(.95)}}
+
+/* barra superior */
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(246,239,230,.72);border-bottom:1px solid rgba(18,60,58,.08)}
+.bar{max-width:980px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--deep)}
+.mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--deep));color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-size:15px;letter-spacing:.02em}
+.brand small{display:block;font-weight:500;font-size:11px;color:var(--muted)}
+.nav{display:flex;gap:6px;align-items:center}
+.pill{padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--deep);background:rgba(18,60,58,.07);transition:.2s}
+.pill:hover{background:rgba(18,60,58,.14)}
+.pill.on{background:var(--deep);color:#fff}
+
+main{max-width:980px;margin:auto;padding:22px 18px 80px}
+.view{display:none;animation:in .45s ease}
+.view.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* hero */
+.hero{position:relative;border-radius:30px;overflow:hidden;min-height:430px;display:flex;align-items:flex-end;color:#fff;box-shadow:var(--shadow);
+  background:radial-gradient(ellipse at 20% 20%,rgba(127,209,193,.55),transparent 55%),radial-gradient(ellipse at 85% 75%,rgba(242,160,123,.55),transparent 55%),linear-gradient(150deg,#0f3533,#1f6f68 60%,#2d8a7f)}
+.hero .photo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.0;transition:opacity .8s}
+.hero .photo{background-image:url("https://images.pexels.com/photos/5699466/pexels-photo-5699466.jpeg?auto=compress&cs=tinysrgb&w=1600");opacity:.42}
+.hero .photo.has{opacity:.5}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,53,51,.15),rgba(15,53,51,.75))}
+.hero-in{z-index:2}
+.split{display:grid;grid-template-columns:1.2fr 1fr;gap:0;padding:0;overflow:hidden}
+.split .txt{padding:26px}
+.split .img{background:url("https://images.pexels.com/photos/7176055/pexels-photo-7176055.jpeg?auto=compress&cs=tinysrgb&w=900") center/cover;min-height:260px;animation:kb 20s ease-in-out infinite alternate}
+@keyframes kb{from{background-size:110%}to{background-size:130%}}
+@media(max-width:760px){.split{grid-template-columns:1fr}.split .img{order:-1;min-height:200px}}
+.waves{position:absolute;inset:0;opacity:.35;z-index:1}
+.waves path{animation:wave 9s ease-in-out infinite alternate}
+.waves path:nth-child(2){animation-duration:12s}
+.waves path:nth-child(3){animation-duration:15s}
+@keyframes wave{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
+.hero-in{position:relative;padding:38px 34px;max-width:620px}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(255,255,255,.16);padding:7px 12px;border-radius:999px;margin-bottom:16px}
+.hero h1{font-size:clamp(36px,6vw,58px);line-height:1.02;margin-bottom:14px}
+.hero p{font-size:17px;line-height:1.55;opacity:.92;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 26px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .15s,box-shadow .2s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn-main{background:#fff;color:var(--deep);box-shadow:0 10px 30px -10px rgba(0,0,0,.45)}
+.btn-main:hover{transform:translateY(-2px)}
+.btn-dark{background:var(--deep);color:#fff}
+.btn-dark:hover{background:var(--teal)}
+.btn-soft{background:rgba(18,60,58,.08);color:var(--deep)}
+.btn-wa{background:#1fa855;color:#fff}
+.btn:disabled{opacity:.4;pointer-events:none}
+.pulse{animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.stat{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 8px 30px -18px rgba(18,60,58,.5)}
+.stat b{display:block;font-family:Fraunces,serif;font-size:32px;color:var(--teal)}
+.stat span{font-size:14px;color:var(--muted)}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:0 8px 30px -18px rgba(18,60,58,.5);margin-bottom:16px}
+.card h2{font-size:26px;margin-bottom:10px;color:var(--deep)}
+.card p{line-height:1.6;color:#33413f}
+.signs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+.sign{border-left:4px solid var(--mint);padding:12px 14px;background:#f4faf8;border-radius:12px;font-size:15px;line-height:1.45}
+.sign:nth-child(2n){border-color:var(--peach);background:#fdf4ef}
+.sign:nth-child(3n){border-color:var(--gold);background:#fdf8ec}
+.ticker{overflow:hidden;white-space:nowrap;border-radius:14px;background:var(--deep);color:#d9f1ec;font-size:14px;padding:11px 0;margin:16px 0}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 34s linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+
+.psico{display:flex;gap:18px;align-items:center}
+.avatar{width:84px;height:84px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--mint),var(--teal));background-size:cover;background-position:center;color:#fff;display:grid;place-items:center;font-family:Fraunces,serif;font-size:28px;box-shadow:0 0 0 4px #fff,0 0 0 6px var(--mint)}
+
+/* formulario */
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px;color:var(--deep)}
+.in{width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid #d6e2df;background:#fbfdfc;transition:border .2s}
+.in:focus{outline:none;border-color:var(--teal);background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:14px;line-height:1.45;color:#33413f}
+.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--teal)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+
+/* test */
+.prog{height:10px;background:#e3ece9;border-radius:99px;overflow:hidden;margin:6px 0 8px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--teal));border-radius:99px;transition:width .4s ease}
+.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:600}
+.qcard{background:var(--card);border-radius:28px;padding:34px 28px;box-shadow:var(--shadow);margin-top:14px;min-height:340px;position:relative;overflow:hidden}
+.qcard::before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(127,209,193,.35),transparent 70%);top:-90px;right:-70px}
+.qnum{font-family:Fraunces,serif;font-size:64px;color:rgba(31,111,104,.14);line-height:1;position:absolute;top:18px;right:26px}
+.qtext{font-family:Fraunces,serif;font-size:clamp(22px,3.4vw,30px);line-height:1.25;color:var(--deep);margin:10px 0 28px;max-width:640px;position:relative}
+.scale{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.opt{aspect-ratio:1/1;border-radius:16px;background:#eef5f3;font-weight:700;font-size:20px;color:var(--deep);transition:transform .15s,background .2s,color .2s;position:relative}
+.opt:hover{transform:translateY(-3px);background:#dcefe9}
+.opt.sel{background:var(--teal);color:#fff;transform:translateY(-3px) scale(1.04);box-shadow:0 10px 24px -10px var(--teal)}
+.ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:10px;font-weight:500}
+.qfade{animation:qin .35s ease}
+@keyframes qin{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+
+.range{width:100%;accent-color:var(--peach);height:36px}
+.vasval{font-family:Fraunces,serif;font-size:72px;color:var(--peach);text-align:center;line-height:1}
+
+/* resultado */
+.result{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+.gauge{background:var(--card);border-radius:28px;padding:24px;text-align:center;box-shadow:var(--shadow)}
+.gauge svg{width:100%;max-width:250px}
+.gnum{font-family:Fraunces,serif;font-size:46px;fill:var(--deep)}
+.level{display:inline-block;padding:8px 16px;border-radius:999px;font-weight:700;font-size:14px;margin-top:6px}
+.lv0{background:#dff3ee;color:#16655d}.lv1{background:#fdf1d9;color:#8a5a00}.lv2{background:#fbe1e1;color:#9a2d36}
+.bars{margin-top:14px}
+.brow{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:center;font-size:14px;margin:9px 0}
+.brow .t{grid-column:1/-1;color:#33413f;line-height:1.35}
+.btrack{height:9px;background:#eaf1ef;border-radius:99px;overflow:hidden}
+.btrack i{display:block;height:100%;width:0;border-radius:99px;transition:width 1s ease}
+.brow b{text-align:right;color:var(--deep)}
+.note{font-size:13px;color:var(--muted);line-height:1.5;background:#f4f7f6;border-radius:14px;padding:14px;margin-top:14px}
+.alert{background:#fff4ef;border-left:4px solid var(--rose);padding:14px 16px;border-radius:12px;line-height:1.5;margin-top:14px;font-size:15px}
+.wa-num{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* panel */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #e6eeec}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td .level{padding:4px 10px;font-size:12px;margin:0}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.pin{max-width:320px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--deep);color:#fff;padding:13px 20px;border-radius:999px;font-weight:600;font-size:14px;transition:transform .35s;z-index:50}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;font-size:12.5px;color:var(--muted);padding:20px;line-height:1.6}
+footer a{color:var(--teal)}
+
+@media(max-width:760px){
+  .result{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stats .stat:last-child{grid-column:1/-1}
+  .row{grid-template-columns:1fr}
+  .hero-in{padding:28px 22px}
+  .scale{gap:5px}.opt{font-size:17px;border-radius:12px}
+  .brand small{display:none}
+}
+@media print{
+  header,.bg,.actions,footer,.noprint{display:none!important}
+  body{background:#fff}.view{display:none!important}#v-result{display:block!important}
+  .gauge,.card{box-shadow:none;border:1px solid #ddd}
+}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<header>
+  <div class="bar">
+    <div class="brand"><div class="mark">TF</div><div><span data-t="appName">Test de Fatiga</span><small id="brandPsico">Consulta psicológica</small></div></div>
+    <div class="nav">
+      <button class="pill" data-go="home" data-t="navHome">Inicio</button>
+      <button class="pill" data-go="panel" data-t="navPanel">Panel</button>
+      <button class="pill" id="langBtn">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- INICIO -->
+<section class="view on" id="v-home">
+  <div class="hero">
+    <div class="photo" id="heroPhoto"></div>
+    <svg class="waves" viewBox="0 0 800 430" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-50 300 C150 240 300 360 500 300 S750 240 850 290 V430 H-50Z" fill="#7fd1c1" opacity=".5"/>
+      <path d="M-50 340 C120 300 320 400 520 340 S760 300 850 340 V430 H-50Z" fill="#f2a07b" opacity=".45"/>
+      <path d="M-50 380 C180 350 330 420 540 380 S760 360 850 385 V430 H-50Z" fill="#fff" opacity=".25"/>
+    </svg>
+    <div class="hero-in">
+      <span class="tag" data-t="heroTag">3 minutos · 10 preguntas</span>
+      <h1 data-t="heroTitle">¿Qué tan cansado te sientes de verdad?</h1>
+      <p data-t="heroText">Responde este test con calma y con sinceridad. Al final verás tu resultado y podrás enviárselo a tu psicóloga para conversarlo en consulta.</p>
+      <button class="btn btn-main pulse" data-go="data" data-t="start">Empezar el test</button>
+    </div>
+  </div>
+
+  <div class="ticker"><span id="tick"></span></div>
+
+  <div class="stats">
+    <div class="stat"><b>9</b><span data-t="st1">preguntas de la Escala de Severidad de Fatiga (FSS)</span></div>
+    <div class="stat"><b>1 – 7</b><span data-t="st2">qué tanto estás de acuerdo con cada frase</span></div>
+    <div class="stat"><b id="statCount">0</b><span data-t="st3">tests hechos en este dispositivo</span></div>
+  </div>
+
+  <div class="card split">
+    <div class="txt">
+    <h2 data-t="whatTitle">¿Qué es la fatiga?</h2>
+    <p data-t="whatText">La fatiga es más que sueño. Es un agotamiento físico y mental que no se quita del todo con descanso, y que puede afectar el trabajo, la familia y el ánimo. Puede tener causas emocionales, como el estrés o la ansiedad, o causas médicas.</p>
+    <div class="signs">
+      <div class="sign" data-t="s1">Te levantas cansado aunque hayas dormido.</div>
+      <div class="sign" data-t="s2">Te cuesta concentrarte o recordar cosas.</div>
+      <div class="sign" data-t="s3">Tareas sencillas te parecen pesadas.</div>
+      <div class="sign" data-t="s4">Tienes menos ganas de hacer lo que antes disfrutabas.</div>
+    </div>
+    </div>
+    <div class="img" role="img" aria-label="Sesión de psicología"></div>
+  </div>
+
+  <div class="card psico">
+    <div class="avatar" id="avatar">P</div>
+    <div>
+      <h2 id="psicoName" style="font-size:22px;margin-bottom:4px">Tu psicóloga</h2>
+      <p id="psicoInfo" data-t="psicoDefault">Este test es una herramienta de apoyo. El resultado se revisa siempre en consulta.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DATOS -->
+<section class="view" id="v-data">
+  <div class="card">
+    <h2 data-t="dataTitle">Antes de empezar</h2>
+    <p data-t="dataText">Estos datos solo sirven para que tu psicóloga identifique tu resultado.</p>
+    <form id="fData">
+      <label for="fName" data-t="fName">Nombre completo</label>
+      <input class="in" id="fName" required autocomplete="name">
+      <div class="row">
+        <div><label for="fAge" data-t="fAge">Edad</label><input class="in" id="fAge" type="number" min="12" max="110" required></div>
+        <div><label for="fSex" data-t="fSex">Sexo</label>
+          <select class="in" id="fSex"><option value="F" data-t="sexF">Femenino</option><option value="M" data-t="sexM">Masculino</option><option value="O" data-t="sexO">Otro / prefiero no decir</option></select></div>
+      </div>
+      <div class="row">
+        <div><label for="fJob" data-t="fJob">Ocupación</label><input class="in" id="fJob"></div>
+        <div><label for="fPhone" data-t="fPhone">Celular (opcional)</label><input class="in" id="fPhone" type="tel"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="fOk" required><span data-t="consent">Acepto que mis respuestas se usen solo para mi atención psicológica, de forma confidencial (Ley 1090 de 2006 y Ley 1581 de 2012).</span></label>
+      <div class="actions">
+        <button type="button" class="btn btn-soft" data-go="home" data-t="back">Volver</button>
+        <button class="btn btn-dark" type="submit" data-t="next">Continuar</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- TEST -->
+<section class="view" id="v-test">
+  <div class="qmeta"><span id="qLabel"></span><span id="qPct">0%</span></div>
+  <div class="prog"><i id="qBar"></i></div>
+  <p style="color:var(--muted);font-size:14px;margin-top:10px" data-t="instr">Piensa en la última semana. ¿Qué tanto estás de acuerdo con cada frase? 1 = nada de acuerdo, 7 = totalmente de acuerdo.</p>
+  <div class="qcard" id="qCard">
+    <div class="qnum" id="qNum">01</div>
+    <div class="qtext" id="qText"></div>
+    <div class="scale" id="scale"></div>
+    <div class="ends"><span data-t="endLo">Nada de acuerdo</span><span data-t="endHi">Totalmente de acuerdo</span></div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-soft" id="qPrev" data-t="prev">Anterior</button>
+    <button class="btn btn-dark" id="qNext" disabled data-t="next">Continuar</button>
+  </div>
+</section>
+
+<!-- VAS -->
+<section class="view" id="v-vas">
+  <div class="qmeta"><span data-t="lastQ">Última pregunta</span><span>100%</span></div>
+  <div class="prog"><i style="width:100%"></i></div>
+  <div class="qcard">
+    <div class="qnum">10</div>
+    <div class="qtext" data-t="vasQ">De 0 a 10, ¿cuánta fatiga sientes hoy?</div>
+    <div class="vasval" id="vasVal">5</div>
+    <input type="range" min="0" max="10" value="5" class="range" id="vas">
+    <div class="ends"><span data-t="vasLo">Nada de fatiga</span><span data-t="vasHi">La peor fatiga imaginable</span></div>
+    <label for="fNotes" data-t="notesL">¿Algo más que quieras contarle a tu psicóloga? (opcional)</label>
+    <textarea class="in" id="fNotes" rows="3"></textarea>
+  </div>
+  <div class="actions">
+    <button class="btn btn-soft" id="vasPrev" data-t="prev">Anterior</button>
+    <button class="btn btn-dark" id="finish" data-t="finish">Ver mi resultado</button>
+  </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="view" id="v-result">
+  <div class="result">
+    <div class="gauge">
+      <svg viewBox="0 0 220 140">
+        <defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#7fd1c1"/><stop offset=".5" stop-color="#e8b44c"/><stop offset="1" stop-color="#d9666f"/></linearGradient></defs>
+        <path d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="#e8efed" stroke-width="18" stroke-linecap="round"/>
+        <path id="garc" d="M20 120 A90 90 0 0 1 200 120" fill="none" stroke="url(#gg)" stroke-width="18" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" style="transition:stroke-dashoffset 1.4s ease"/>
+        <text x="110" y="108" text-anchor="middle" class="gnum" id="gnum">0.0</text>
+        <text x="110" y="132" text-anchor="middle" font-size="11" fill="#5b6b69" data-t="outOf">promedio de 1 a 7</text>
+      </svg>
+      <div class="level" id="lvl"></div>
+      <p style="font-size:14px;color:var(--muted);margin-top:12px" id="rSum"></p>
+      <p style="font-size:14px;color:var(--muted)" id="rVas"></p>
+    </div>
+    <div>
+      <div class="card">
+        <h2 id="rTitle"></h2>
+        <p id="rText"></p>
+        <div class="alert" id="rAlert" style="display:none" data-t="alert">Si sientes que no puedes más, si tienes pensamientos de hacerte daño o una crisis, no esperes a la cita: llama a la Línea 106 (Colombia, gratuita las 24 horas) o al 123.</div>
+        <div class="note" data-t="disclaimer">Este test es una herramienta de tamizaje, no un diagnóstico. La fatiga puede tener causas emocionales o médicas (por ejemplo anemia, tiroides o problemas de sueño). Tu psicóloga interpreta el resultado contigo.</div>
+      </div>
+      <div class="card noprint">
+        <h2 style="font-size:20px" data-t="sendTitle">Envíaselo a tu psicóloga</h2>
+        <div class="actions" style="margin-top:12px">
+          <a class="btn btn-wa" id="waBtn" target="_blank" rel="noopener" data-t="sendWa">Enviar por WhatsApp</a>
+          <button class="btn btn-soft" id="copyBtn" data-t="copy">Copiar informe</button>
+          <button class="btn btn-soft" id="printBtn" data-t="print">Imprimir / PDF</button>
+        </div>
+        <p class="wa-num" id="waNum"></p>
+      </div>
+      <div class="card">
+        <h2 style="font-size:20px" data-t="detail">Tus respuestas</h2>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="actions noprint"><button class="btn btn-dark" data-go="home" data-t="done">Terminar</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- PANEL -->
+<section class="view" id="v-panel">
+  <div class="card" id="pinBox">
+    <h2 data-t="panelTitle">Panel de la psicóloga</h2>
+    <p data-t="pinText">Escribe tu clave para ver los resultados guardados en este dispositivo. La clave inicial es 1234; cámbiala en Ajustes.</p>
+    <input class="in pin" id="pinIn" type="password" inputmode="numeric" style="margin-top:14px">
+    <div class="actions"><button class="btn btn-dark" id="pinGo" data-t="enter">Entrar</button></div>
+  </div>
+  <div id="panelBox" style="display:none">
+    <div class="card">
+      <h2 data-t="panelTitle">Panel de la psicóloga</h2>
+      <div class="stats" style="margin:8px 0 6px">
+        <div class="stat"><b id="pTot">0</b><span data-t="pTot">tests</span></div>
+        <div class="stat"><b id="pAvg">–</b><span data-t="pAvg">promedio FSS</span></div>
+        <div class="stat"><b id="pHigh">0</b><span data-t="pHigh">con fatiga significativa</span></div>
+      </div>
+      <div style="overflow-x:auto"><table><thead><tr><th data-t="tDate">Fecha</th><th data-t="tName">Paciente</th><th>FSS</th><th>0–10</th><th data-t="tLevel">Nivel</th></tr></thead><tbody id="tbody"></tbody></table></div>
+      <div class="actions">
+        <button class="btn btn-soft" id="csvBtn" data-t="csv">Copiar en formato Excel</button>
+        <button class="btn btn-soft" id="clearBtn" data-t="clear">Borrar historial</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 data-t="setTitle">Ajustes</h2>
+      <form id="fSet">
+        <label for="sName" data-t="sName">Nombre de la psicóloga</label><input class="in" id="sName" placeholder="Ps. ...">
+        <div class="row">
+          <div><label for="sTp" data-t="sTp">Tarjeta profesional / especialidad</label><input class="in" id="sTp"></div>
+          <div><label for="sWa" data-t="sWa">WhatsApp (10 dígitos)</label><input class="in" id="sWa" type="tel" placeholder="3001234567"></div>
+        </div>
+        <div class="row">
+          <div><label for="sPhoto" data-t="sPhoto">Foto de la psicóloga</label><input class="in" id="sPhoto" type="file" accept="image/*"></div>
+          <div><label for="sHero" data-t="sHero">Foto de portada (consultorio)</label><input class="in" id="sHero" type="file" accept="image/*"></div>
+        </div>
+        <label for="sPin" data-t="sPin">Nueva clave del panel</label><input class="in pin" id="sPin" type="password" inputmode="numeric">
+        <div class="actions"><button class="btn btn-dark" type="submit" data-t="save">Guardar</button></div>
+      </form>
+      <p id="confirmClear" style="display:none;margin-top:12px" class="alert"><span data-t="sure">¿Seguro? Se borran todos los resultados de este dispositivo.</span> <button class="btn btn-dark" id="clearYes" style="padding:8px 16px;margin-left:8px" data-t="yes">Sí, borrar</button></p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <span data-t="foot">Escala de Severidad de Fatiga (FSS) — Krupp y colaboradores, 1989. Herramienta de apoyo, no reemplaza la valoración profesional.</span><br>
+  Hecho por <a href="https://vibraspositivashm.com" target="_blank" rel="noopener">Vibras Positivas HM</a> · Caucasia, Antioquia
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const ITEMS={
+ es:["Mi motivación baja cuando estoy fatigado(a).","El ejercicio o el esfuerzo físico me deja fatigado(a).","Me fatigo con facilidad.","La fatiga interfiere con mi funcionamiento físico.","La fatiga me causa problemas con frecuencia.","La fatiga me impide mantener una actividad física por mucho tiempo.","La fatiga me impide cumplir ciertas tareas y responsabilidades.","La fatiga es uno de los tres síntomas que más me limitan.","La fatiga interfiere con mi trabajo, mi familia o mi vida social."],
+ en:["My motivation is lower when I am fatigued.","Exercise or physical effort brings on my fatigue.","I am easily fatigued.","Fatigue interferes with my physical functioning.","Fatigue causes frequent problems for me.","My fatigue prevents sustained physical functioning.","Fatigue interferes with carrying out certain duties and responsibilities.","Fatigue is among my three most disabling symptoms.","Fatigue interferes with my work, family or social life."]
+};
+const T={
+es:{appName:"Test de Fatiga",navHome:"Inicio",navPanel:"Panel",heroTag:"3 minutos · 10 preguntas",heroTitle:"¿Qué tan cansado te sientes de verdad?",heroText:"Responde este test con calma y con sinceridad. Al final verás tu resultado y podrás enviárselo a tu psicóloga para conversarlo en consulta.",start:"Empezar el test",st1:"preguntas de la Escala de Severidad de Fatiga (FSS)",st2:"qué tanto estás de acuerdo con cada frase",st3:"tests hechos en este dispositivo",whatTitle:"¿Qué es la fatiga?",whatText:"La fatiga es más que sueño. Es un agotamiento físico y mental que no se quita del todo con descanso, y que puede afectar el trabajo, la familia y el ánimo. Puede tener causas emocionales, como el estrés o la ansiedad, o causas médicas.",s1:"Te levantas cansado aunque hayas dormido.",s2:"Te cuesta concentrarte o recordar cosas.",s3:"Tareas sencillas te parecen pesadas.",s4:"Tienes menos ganas de hacer lo que antes disfrutabas.",psicoDefault:"Este test es una herramienta de apoyo. El resultado se revisa siempre en consulta.",dataTitle:"Antes de empezar",dataText:"Estos datos solo sirven para que tu psicóloga identifique tu resultado.",fName:"Nombre completo",fAge:"Edad",fSex:"Sexo",sexF:"Femenino",sexM:"Masculino",sexO:"Otro / prefiero no decir",fJob:"Ocupación",fPhone:"Celular (opcional)",consent:"Acepto que mis respuestas se usen solo para mi atención psicológica, de forma confidencial (Ley 1090 de 2006 y Ley 1581 de 2012).",back:"Volver",next:"Continuar",prev:"Anterior",instr:"Piensa en la última semana. ¿Qué tanto estás de acuerdo con cada frase? 1 = nada de acuerdo, 7 = totalmente de acuerdo.",endLo:"Nada de acuerdo",endHi:"Totalmente de acuerdo",q:"Pregunta",of:"de",lastQ:"Última pregunta",vasQ:"De 0 a 10, ¿cuánta fatiga sientes hoy?",vasLo:"Nada de fatiga",vasHi:"La peor fatiga imaginable",notesL:"¿Algo más que quieras contarle a tu psicóloga? (opcional)",finish:"Ver mi resultado",outOf:"promedio de 1 a 7",alert:"Si sientes que no puedes más, si tienes pensamientos de hacerte daño o una crisis, no esperes a la cita: llama a la Línea 106 (Colombia, gratuita las 24 horas) o al 123.",disclaimer:"Este test es una herramienta de tamizaje, no un diagnóstico. La fatiga puede tener causas emocionales o médicas (por ejemplo anemia, tiroides o problemas de sueño). Tu psicóloga interpreta el resultado contigo.",sendTitle:"Envíaselo a tu psicóloga",sendWa:"Enviar por WhatsApp",copy:"Copiar informe",print:"Imprimir / PDF",detail:"Tus respuestas",done:"Terminar",panelTitle:"Panel de la psicóloga",pinText:"Escribe tu clave para ver los resultados guardados en este dispositivo. La clave inicial es 1234; cámbiala en Ajustes.",enter:"Entrar",pTot:"tests",pAvg:"promedio FSS",pHigh:"con fatiga significativa",tDate:"Fecha",tName:"Paciente",tLevel:"Nivel",csv:"Copiar en formato Excel",clear:"Borrar historial",setTitle:"Ajustes",sName:"Nombre de la psicóloga",sTp:"Tarjeta profesional / especialidad",sWa:"WhatsApp (10 dígitos)",sPhoto:"Foto de la psicóloga",sHero:"Foto de portada (consultorio)",sPin:"Nueva clave del panel",save:"Guardar",sure:"¿Seguro? Se borran todos los resultados de este dispositivo.",yes:"Sí, borrar",foot:"Escala de Severidad de Fatiga (FSS) — Krupp y colaboradores, 1989. Herramienta de apoyo, no reemplaza la valoración profesional.",
+ lv:["Sin fatiga significativa","Fatiga significativa","Fatiga alta"],
+ rt:["Tu nivel de fatiga está dentro de lo esperado","Tu resultado muestra fatiga significativa","Tu resultado muestra fatiga alta"],
+ rx:["Tu promedio está por debajo de 4, el punto de corte de la escala. Aun así, si te sientes cansado(a), vale la pena hablarlo en consulta y cuidar el sueño, la alimentación y las pausas.","Tu promedio es de 4 o más, el punto de corte que indica fatiga significativa. Es importante revisarlo con tu psicóloga y, si no lo has hecho, descartar causas médicas con tu médico.","Tu promedio es de 5 o más: la fatiga está afectando mucho tu vida diaria. Envía este resultado a tu psicóloga y pide también una valoración médica."],
+ sum:"Puntaje total",vasR:"Fatiga hoy",psy:"Tu psicóloga",noWa:"La psicóloga aún no ha configurado su WhatsApp. Usa Copiar informe.",copied:"Informe copiado",saved:"Ajustes guardados",badPin:"Clave incorrecta",empty:"Aún no hay resultados en este dispositivo.",cleared:"Historial borrado",noPrint:"Abre la app desde su enlace en el navegador para imprimir.",
+ tk:"La fatiga crónica afecta la memoria y la concentración  ·  Dormir 7 a 9 horas ayuda a recuperar energía  ·  Las pausas activas cada 2 horas reducen el agotamiento  ·  Hablar de lo que sientes también es descansar  ·  Línea 106: apoyo emocional gratuito en Colombia, las 24 horas",
+ rep:"INFORME – TEST DE FATIGA (FSS)"},
+en:{appName:"Fatigue Test",navHome:"Home",navPanel:"Panel",heroTag:"3 minutes · 10 questions",heroTitle:"How tired do you really feel?",heroText:"Answer calmly and honestly. At the end you'll see your result and can send it to your psychologist to talk it over in session.",start:"Start the test",st1:"questions from the Fatigue Severity Scale (FSS)",st2:"how much you agree with each statement",st3:"tests taken on this device",whatTitle:"What is fatigue?",whatText:"Fatigue is more than sleepiness. It is physical and mental exhaustion that rest doesn't fully relieve, and it can affect work, family and mood. It can have emotional causes, such as stress or anxiety, or medical ones.",s1:"You wake up tired even after sleeping.",s2:"It's hard to concentrate or remember things.",s3:"Simple tasks feel heavy.",s4:"You feel less like doing what you used to enjoy.",psicoDefault:"This test is a support tool. Your result is always reviewed in session.",dataTitle:"Before you start",dataText:"This information only helps your psychologist identify your result.",fName:"Full name",fAge:"Age",fSex:"Sex",sexF:"Female",sexM:"Male",sexO:"Other / prefer not to say",fJob:"Occupation",fPhone:"Mobile (optional)",consent:"I agree that my answers will be used only for my psychological care, confidentially (Colombian Laws 1090/2006 and 1581/2012).",back:"Back",next:"Continue",prev:"Previous",instr:"Think about the past week. How much do you agree with each statement? 1 = strongly disagree, 7 = strongly agree.",endLo:"Strongly disagree",endHi:"Strongly agree",q:"Question",of:"of",lastQ:"Last question",vasQ:"From 0 to 10, how much fatigue do you feel today?",vasLo:"No fatigue",vasHi:"Worst fatigue imaginable",notesL:"Anything else you'd like to tell your psychologist? (optional)",finish:"See my result",outOf:"average from 1 to 7",alert:"If you feel you can't go on, have thoughts of harming yourself or are in crisis, don't wait for your appointment: call Línea 106 (Colombia, free, 24 hours) or 123.",disclaimer:"This test is a screening tool, not a diagnosis. Fatigue can have emotional or medical causes (for example anemia, thyroid or sleep problems). Your psychologist will interpret the result with you.",sendTitle:"Send it to your psychologist",sendWa:"Send via WhatsApp",copy:"Copy report",print:"Print / PDF",detail:"Your answers",done:"Finish",panelTitle:"Psychologist's panel",pinText:"Enter your PIN to see results saved on this device. The initial PIN is 1234; change it in Settings.",enter:"Enter",pTot:"tests",pAvg:"FSS average",pHigh:"with significant fatigue",tDate:"Date",tName:"Patient",tLevel:"Level",csv:"Copy for Excel",clear:"Clear history",setTitle:"Settings",sName:"Psychologist's name",sTp:"License / specialty",sWa:"WhatsApp (10 digits)",sPhoto:"Psychologist's photo",sHero:"Cover photo (office)",sPin:"New panel PIN",save:"Save",sure:"Are you sure? All results on this device will be deleted.",yes:"Yes, delete",foot:"Fatigue Severity Scale (FSS) — Krupp et al., 1989. A support tool; it does not replace professional assessment.",
+ lv:["No significant fatigue","Significant fatigue","High fatigue"],
+ rt:["Your fatigue level is within the expected range","Your result shows significant fatigue","Your result shows high fatigue"],
+ rx:["Your average is below 4, the scale's cut-off. Still, if you feel tired it's worth talking about in session and looking after sleep, food and breaks.","Your average is 4 or higher, the cut-off for significant fatigue. Review it with your psychologist and, if you haven't yet, rule out medical causes with your doctor.","Your average is 5 or higher: fatigue is strongly affecting your daily life. Send this result to your psychologist and also ask for a medical check-up."],
+ sum:"Total score",vasR:"Fatigue today",psy:"Your psychologist",noWa:"The psychologist hasn't set up her WhatsApp yet. Use Copy report.",copied:"Report copied",saved:"Settings saved",badPin:"Wrong PIN",empty:"No results on this device yet.",cleared:"History cleared",noPrint:"Open the app from its link in a browser to print.",
+ tk:"Chronic fatigue affects memory and concentration  ·  Sleeping 7 to 9 hours helps restore energy  ·  Active breaks every 2 hours reduce exhaustion  ·  Talking about how you feel is also rest  ·  Línea 106: free emotional support in Colombia, 24 hours",
+ rep:"REPORT – FATIGUE TEST (FSS)"}
+};
+
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem("tf_"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("tf_"+k,JSON.stringify(v));return true}catch(e){return false}}};
+let lang=store.get("lang","es"), cfg=store.get("cfg",{name:"",tp:"",wa:"",pin:"1234",photo:"",hero:""});
+let patient={}, ans=Array(9).fill(0), qi=0, last=null;
+const t=k=>T[lang][k];
+
+function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2400)}
+function nowBog(){return new Intl.DateTimeFormat(lang==="es"?"es-CO":"en-US",{timeZone:"America/Bogota",dateStyle:"medium",timeStyle:"short"}).format(new Date())}
+
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-t]").forEach(e=>{const v=T[lang][e.dataset.t];if(typeof v==="string")e.textContent=v});
+  $("#langBtn").textContent=lang==="es"?"EN":"ES";
+  $("#tick").textContent=t("tk");
+  document.title=t("appName");
+  applyCfg(); if($("#v-test").classList.contains("on"))renderQ(false); if(last&&$("#v-result").classList.contains("on"))renderResult(last,false);
+}
+function applyCfg(){
+  const n=cfg.name||t("psy");
+  $("#psicoName").textContent=n;
+  $("#brandPsico").textContent=cfg.name||(lang==="es"?"Consulta psicológica":"Psychology practice");
+  $("#psicoInfo").textContent=cfg.tp?cfg.tp+" · "+t("psicoDefault"):t("psicoDefault");
+  const av=$("#avatar");
+  if(cfg.photo){av.style.backgroundImage=`url(${cfg.photo})`;av.textContent=""}else{av.style.backgroundImage="";av.textContent=(cfg.name.replace(/^Ps\.?\s*/i,"")[0]||"P").toUpperCase()}
+  const hp=$("#heroPhoto"); if(cfg.hero){hp.style.backgroundImage=`url(${cfg.hero})`;hp.classList.add("has")}else hp.classList.remove("has");
+  $("#statCount").textContent=store.get("hist",[]).length;
+}
+
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("on"));
+  $("#v-"+v).classList.add("on");
+  document.querySelectorAll(".pill[data-go]").forEach(p=>p.classList.toggle("on",p.dataset.go===v||(v!=="panel"&&p.dataset.go==="home"&&v==="home")));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(v==="panel"){$("#pinBox").style.display="";$("#panelBox").style.display="none";$("#pinIn").value=""}
+}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){e.preventDefault();go(g.dataset.go)}});
+$("#langBtn").onclick=()=>{lang=lang==="es"?"en":"es";store.set("lang",lang);applyLang()};
+
+$("#fData").addEventListener("submit",e=>{e.preventDefault();
+  patient={name:$("#fName").value.trim(),age:$("#fAge").value,sex:$("#fSex").value,job:$("#fJob").value.trim(),phone:$("#fPhone").value.trim()};
+  ans=Array(9).fill(0);qi=0;$("#vas").value=5;$("#vasVal").textContent=5;$("#fNotes").value="";go("test");renderQ(true)});
+
+function renderQ(anim){
+  $("#qLabel").textContent=`${t("q")} ${qi+1} ${t("of")} 10`;
+  const pct=Math.round(qi/10*100);$("#qPct").textContent=pct+"%";$("#qBar").style.width=pct+"%";
+  $("#qNum").textContent=String(qi+1).padStart(2,"0");
+  $("#qText").textContent=ITEMS[lang][qi];
+  const sc=$("#scale");sc.innerHTML="";
+  for(let i=1;i<=7;i++){const b=document.createElement("button");b.className="opt"+(ans[qi]===i?" sel":"");b.textContent=i;b.setAttribute("aria-label",i);
+    b.onclick=()=>{ans[qi]=i;sc.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel"));b.classList.add("sel");$("#qNext").disabled=false;setTimeout(nextQ,320)};sc.appendChild(b)}
+  $("#qNext").disabled=!ans[qi];
+  if(anim){const c=$("#qCard");c.classList.remove("qfade");void c.offsetWidth;c.classList.add("qfade")}
+}
+function nextQ(){if(!ans[qi])return;if(qi<8){qi++;renderQ(true)}else go("vas")}
+$("#qNext").onclick=nextQ;
+$("#qPrev").onclick=()=>{if(qi>0){qi--;renderQ(true)}else go("data")};
+$("#vas").oninput=e=>$("#vasVal").textContent=e.target.value;
+$("#vasPrev").onclick=()=>{go("test");qi=8;renderQ(true)};
+
+$("#finish").onclick=()=>{
+  const sum=ans.reduce((a,b)=>a+b,0),mean=sum/9;
+  const lvl=mean>=5?2:mean>=4?1:0;
+  last={id:Date.now(),date:new Date().toISOString(),p:{...patient},ans:[...ans],sum,mean:Math.round(mean*100)/100,lvl,vas:+$("#vas").value,notes:$("#fNotes").value.trim()};
+  const h=store.get("hist",[]);h.unshift(last);store.set("hist",h);applyCfg();
+  go("result");renderResult(last,true)};
+
+function report(r){
+  const L=T[lang];
+  let s=`${L.rep}\n${cfg.name?L.psy+": "+cfg.name+"\n":""}${L.tDate}: ${new Intl.DateTimeFormat(lang==="es"?"es-CO":"en-US",{timeZone:"America/Bogota",dateStyle:"medium",timeStyle:"short"}).format(new Date(r.date))} (hora Colombia)\n\n`;
+  s+=`${L.tName}: ${r.p.name}\n${L.fAge}: ${r.p.age} · ${L.fSex}: ${r.p.sex}${r.p.job?" · "+L.fJob+": "+r.p.job:""}${r.p.phone?"\n"+L.fPhone.replace(/ \(.*\)/,"")+": "+r.p.phone:""}\n\n`;
+  s+=`FSS: ${r.mean.toFixed(2)} / 7 — ${L.lv[r.lvl]}\n${L.sum}: ${r.sum} / 63\n${L.vasR}: ${r.vas} / 10\n\n`;
+  ITEMS[lang].forEach((q,i)=>s+=`${i+1}. ${q} → ${r.ans[i]}\n`);
+  if(r.notes)s+=`\n${L.notesL.replace(/ \(.*\)/,"")}:\n${r.notes}\n`;
+  return s;
+}
+function renderResult(r,anim){
+  const L=T[lang];
+  const frac=(r.mean-1)/6, arc=$("#garc");
+  if(anim){arc.style.strokeDashoffset=283;setTimeout(()=>arc.style.strokeDashoffset=283*(1-frac),80);
+    let n=0;const st=performance.now();(function f(ts){const p=Math.min(1,(ts-st)/1400);$("#gnum").textContent=(1+(r.mean-1)*p).toFixed(1);if(p<1)requestAnimationFrame(f)})(st)}
+  else{arc.style.strokeDashoffset=283*(1-frac);$("#gnum").textContent=r.mean.toFixed(1)}
+  const lv=$("#lvl");lv.className="level lv"+r.lvl;lv.textContent=L.lv[r.lvl];
+  $("#rSum").textContent=`${L.sum}: ${r.sum} / 63`;$("#rVas").textContent=`${L.vasR}: ${r.vas} / 10`;
+  $("#rTitle").textContent=(r.p.name?r.p.name.split(" ")[0]+", ":"")+L.rt[r.lvl].charAt(0).toLowerCase()+L.rt[r.lvl].slice(1);
+  $("#rText").textContent=L.rx[r.lvl];
+  $("#rAlert").style.display=(r.lvl===2||r.vas>=9)?"":"none";
+  const b=$("#bars");b.innerHTML="";
+  ITEMS[lang].forEach((q,i)=>{const v=r.ans[i],c=v>=5?"var(--rose)":v>=4?"var(--gold)":"var(--mint)";
+    const d=document.createElement("div");d.className="brow";d.innerHTML=`<span class="t"></span><div class="btrack"><i style="background:${c}"></i></div><b>${v}/7</b>`;
+    d.querySelector(".t").textContent=(i+1)+". "+q;b.appendChild(d);
+    setTimeout(()=>d.querySelector("i").style.width=(v/7*100)+"%",anim?150+i*90:0)});
+  const wa=(cfg.wa||"").replace(/\D/g,"");
+  if(wa.length>=10){const num=wa.length===10?"57"+wa:wa;$("#waBtn").href=`https://wa.me/${num}?text=${encodeURIComponent(report(r))}`;$("#waBtn").style.display="";$("#waNum").textContent="WhatsApp: +"+num}
+  else{$("#waBtn").style.display="none";$("#waNum").textContent=L.noWa}
+}
+async function copyText(s){try{await navigator.clipboard.writeText(s);toast(t("copied"))}catch(e){const ta=document.createElement("textarea");ta.value=s;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast(t("copied"))}catch(_){}ta.remove()}}
+$("#copyBtn").onclick=()=>last&&copyText(report(last));
+$("#printBtn").onclick=()=>{try{window.print()}catch(e){toast(t("noPrint"))}};
+
+/* panel */
+$("#pinGo").onclick=()=>{if($("#pinIn").value===(cfg.pin||"1234")){$("#pinBox").style.display="none";$("#panelBox").style.display="";renderPanel()}else toast(t("badPin"))};
+$("#pinIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("#pinGo").click()});
+function renderPanel(){
+  const h=store.get("hist",[]),L=T[lang];
+  $("#pTot").textContent=h.length;$("#pAvg").textContent=h.length?(h.reduce((a,r)=>a+r.mean,0)/h.length).toFixed(2):"–";$("#pHigh").textContent=h.filter(r=>r.lvl>0).length;
+  const tb=$("#tbody");tb.innerHTML="";
+  if(!h.length){tb.innerHTML=`<tr><td colspan="5" class="empty"></td></tr>`;tb.querySelector("td").textContent=L.empty}
+  h.forEach(r=>{const tr=document.createElement("tr");tr.style.cursor="pointer";
+    tr.innerHTML=`<td></td><td></td><td><b>${r.mean.toFixed(2)}</b></td><td>${r.vas}</td><td><span class="level lv${r.lvl}"></span></td>`;
+    tr.children[0].textContent=new Intl.DateTimeFormat(lang==="es"?"es-CO":"en-US",{timeZone:"America/Bogota",dateStyle:"short",timeStyle:"short"}).format(new Date(r.date));
+    tr.children[1].textContent=r.p.name+" ("+r.p.age+")";tr.querySelector(".level").textContent=L.lv[r.lvl];
+    tr.onclick=()=>{last=r;go("result");renderResult(r,true)};tb.appendChild(tr)});
+  $("#sName").value=cfg.name||"";$("#sTp").value=cfg.tp||"";$("#sWa").value=cfg.wa||"";
+}
+$("#csvBtn").onclick=()=>{const h=store.get("hist",[]);let s=["Fecha","Paciente","Edad","Sexo","Ocupacion","Celular",...ITEMS.es.map((_,i)=>"P"+(i+1)),"Total","FSS","Fatiga hoy","Nivel","Notas"].join("\t")+"\n";
+  h.forEach(r=>s+=[new Date(r.date).toLocaleString("es-CO",{timeZone:"America/Bogota"}),r.p.name,r.p.age,r.p.sex,r.p.job,r.p.phone,...r.ans,r.sum,String(r.mean).replace(".",","),r.vas,T.es.lv[r.lvl],(r.notes||"").replace(/\s+/g," ")].join("\t")+"\n");copyText(s)};
+$("#clearBtn").onclick=()=>$("#confirmClear").style.display="";
+$("#clearYes").onclick=()=>{store.set("hist",[]);$("#confirmClear").style.display="none";renderPanel();applyCfg();toast(t("cleared"))};
+function readImg(inp,max){return new Promise(res=>{const f=inp.files[0];if(!f)return res(null);const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.82))};im.src=fr.result};fr.readAsDataURL(f)})}
+$("#fSet").addEventListener("submit",async e=>{e.preventDefault();
+  cfg.name=$("#sName").value.trim();cfg.tp=$("#sTp").value.trim();cfg.wa=$("#sWa").value.trim();
+  if($("#sPin").value)cfg.pin=$("#sPin").value;
+  const p=await readImg($("#sPhoto"),360),hh=await readImg($("#sHero"),1400);if(p)cfg.photo=p;if(hh)cfg.hero=hh;
+  store.set("cfg",cfg);applyCfg();toast(t("saved"));$("#sPin").value=""});
+
+applyLang();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
